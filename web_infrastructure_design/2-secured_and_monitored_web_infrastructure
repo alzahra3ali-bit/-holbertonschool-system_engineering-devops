@@ -1,13 +1,37 @@
 https://i.imgur.com/your-diagram-link.png
 
 ### 1. Secured and Monitored Web Infrastructure Description
-This architecture builds upon the distributed setup by adding security measures (firewalls, SSL) and monitoring agents to ensure high reliability and security.
+This architecture enhances the distributed setup by adding critical security layers (firewalls, SSL/TLS encryption) and monitoring clients to track system performance and uptime.
 
-- **Firewalls**: Placed in front of every server to filter incoming and outgoing network traffic based on security rules.
-- **SSL/TLS (HTTPS)**: Encrypts data traffic between the client and the web servers.
-- **Monitoring Clients (Datadog / Prometheus)**: Installed on servers to track metrics (CPU usage, memory, network traffic) and trigger alerts.
+- **User**: Requests www.foobar.com via secure HTTPS.
+- **Firewalls**: Placed in front of the Load Balancer and both backend servers to filter incoming and outgoing traffic based on predefined security rules.
+- **Load Balancer (HAProxy with SSL Termination)**: Distributes encrypted/decrypted traffic to backend servers and holds the SSL certificate.
+- **Web & App Servers (Server 1 & Server 2)**: Equipped with Nginx, application code, MySQL database nodes, and monitoring agents.
+- **Monitoring Clients (Data Collectors)**: Installed on servers to gather metrics and logs, sending them to a centralized monitoring system.
 
-### 2. Specifics & Additions
-- **Role of Firewalls**: Protects infrastructure by blocking unauthorized access and allowing only necessary ports (e.g., 80, 443, 22).
-- **SSL/HTTPS**: Secures user data and passwords from man-in-the-middle attacks.
-- **Monitoring Tools**: Collects performance metrics, monitors uptime, and alerts engineers when a service fails.
+---
+
+### 2. Specifics & Explanations
+- **Why add Firewalls?** 
+  To secure the infrastructure by acting as a barrier, blocking unauthorized access while permitting only legitimate traffic (e.g., ports 80, 443, 22).
+- **What are Firewalls for?** 
+  To inspect network packets, enforce security policies, and prevent malicious attacks (such as unauthorized intrusions, DDoS, or unauthorized port scanning).
+- **Why is traffic served over HTTPS?** 
+  To encrypt data in transit between the client browser and the server, protecting sensitive information (like passwords and personal data) from man-in-the-middle (MITM) attacks and eavesdropping.
+- **What is monitoring used for?** 
+  To track the health, availability, and performance of servers and services in real-time, allowing engineers to detect anomalies, analyze logs, and receive alerts when issues arise.
+- **How does the monitoring tool collect data?** 
+  A monitoring agent/client is installed on each server. It continuously polls system metrics (CPU, RAM, disk usage, network traffic) and collects application/system logs, forwarding them to a centralized collector or dashboard service.
+- **How to monitor your web server QPS (Queries Per Second)?** 
+  You can monitor web server QPS by configuring the monitoring agent (or log shipper) to parse the web server access logs (e.g., Nginx access logs) in real time or by querying the web server's built-in status module (like 
+gx_http_stub_status_module) and graphing the request rate over time in a tool like Prometheus or Grafana.
+
+---
+
+### 3. Infrastructure Issues & Analysis
+- **Why terminating SSL at the load balancer level is an issue:** 
+  If SSL is terminated at the load balancer, traffic between the load balancer and the backend web servers travels in plain text (unencrypted). If an attacker breaches the internal network, they can sniff this internal traffic. It also places the heavy computational load of decryption/encryption entirely on the load balancer.
+- **Why having only one MySQL server capable of accepting writes is an issue:** 
+  Having a single write-capable server (Primary/Master) creates a bottleneck and a Single Point of Failure (SPOF) for write operations. If the primary database fails, the application cannot process new records, sign-ups, or data updates until a failover occurs.
+- **Why having servers with all the same components (database, web server and application server) might be a problem:** 
+  Coupling all components (web server, app server, and database) on the same machine creates resource contention. The database and application server compete for CPU, RAM, and disk I/O, making it harder to scale individual layers independently, optimize performance, or isolate failures.
