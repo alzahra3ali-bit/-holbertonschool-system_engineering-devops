@@ -1,0 +1,23 @@
+https://i.imgur.com/your-diagram-link.png
+
+### 1. Distributed Web Infrastructure Diagram Description
+This architecture scales out the simple stack by distributing components across multiple servers to improve availability and handle higher traffic.
+
+- **Load Balancer (HAProxy)**: Distributes incoming traffic across multiple web servers using a round-robin algorithm.
+- **Web Servers (2x)**: Serve static files and handle incoming client requests.
+- **Application Servers (2x)**: Process dynamic application logic.
+- **Database (Primary-Replica MySQL Cluster)**: Handles database queries with data replication.
+
+### 2. Specifics & Setup
+- **Load Balancer Distribution Algorithm**: Round-robin (distributes requests sequentially).
+- **Active-Active vs Active-Passive**:
+  - *Active-Active*: All nodes handle active traffic simultaneously.
+  - *Active-Passive*: The passive node stands by and takes over only if the active node fails.
+- **Primary-Replica Database Setup**:
+  - *Primary (Master)*: Handles write operations (INSERT, UPDATE, DELETE).
+  - *Replica (Slave)*: Handles read operations (SELECT) and syncs data from the primary.
+
+### 3. Infrastructure Issues
+- **SpF (Single Points of Failure)**: The Load Balancer and Primary Database are still single points of failure.
+- **Security issues**: No firewall, traffic is unencrypted (HTTP), and no HTTPS.
+- **Lack of monitoring**: No visibility into server health, traffic spikes, or resource usage.

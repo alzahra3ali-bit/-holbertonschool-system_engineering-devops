@@ -1,0 +1,24 @@
+https://i.imgur.com/your-diagram-link.png
+
+### 1. Simple Web Stack Infrastructure Diagram Description
+This infrastructure represents a basic, single-server web stack (LAMP stack) designed to host a website accessible via www.foobar.com.
+
+- **User**: Opens a browser and requests www.foobar.com.
+- **DNS**: Resolves the domain name to the server's public IP address (8.8.8.8).
+- **Web Server (Nginx)**: Receives HTTP/HTTPS requests and serves static content or proxies dynamic requests.
+- **Application Server**: Processes business logic and executes the codebase.
+- **Database (MySQL)**: Stores and manages persistent application data.
+
+### 2. Component Roles & Specifics
+- **Server**: A computer system providing services to clients.
+- **Domain Name**: Human-readable alias for numerical IP addresses.
+- **DNS Record (www)**: A record mapping www.foobar.com to 8.8.8.8.
+- **Web Server Role**: Serves static pages and handles incoming HTTP traffic.
+- **Application Server Role**: Runs the application code.
+- **Database Role**: Persistently stores and retrieves application data.
+- **Communication Protocol**: TCP/IP (HTTP/HTTPS).
+
+### 3. Infrastructure Issues
+- **SPOF (Single Point of Failure)**: If the server fails, the entire application goes offline.
+- **Downtime during maintenance**: Deployments or reboots require taking the server down.
+- **Scalability limitations**: Limited by the CPU, RAM, and storage of a single machine.

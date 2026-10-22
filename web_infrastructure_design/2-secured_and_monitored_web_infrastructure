@@ -1,0 +1,13 @@
+https://i.imgur.com/your-diagram-link.png
+
+### 1. Secured and Monitored Web Infrastructure Description
+This architecture builds upon the distributed setup by adding security measures (firewalls, SSL) and monitoring agents to ensure high reliability and security.
+
+- **Firewalls**: Placed in front of every server to filter incoming and outgoing network traffic based on security rules.
+- **SSL/TLS (HTTPS)**: Encrypts data traffic between the client and the web servers.
+- **Monitoring Clients (Datadog / Prometheus)**: Installed on servers to track metrics (CPU usage, memory, network traffic) and trigger alerts.
+
+### 2. Specifics & Additions
+- **Role of Firewalls**: Protects infrastructure by blocking unauthorized access and allowing only necessary ports (e.g., 80, 443, 22).
+- **SSL/HTTPS**: Secures user data and passwords from man-in-the-middle attacks.
+- **Monitoring Tools**: Collects performance metrics, monitors uptime, and alerts engineers when a service fails.
