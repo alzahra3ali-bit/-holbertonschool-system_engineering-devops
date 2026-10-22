@@ -1,0 +1,21 @@
+https://i.imgur.com/your-diagram-link.png
+
+### 1. Scaled-Up Web Infrastructure Description
+This advanced architecture scales up and optimizes the infrastructure by decoupling/splitting the components onto dedicated servers, introducing a second load balancer for high availability, and separating the database tier.
+
+- **Load Balancers (HAProxy 1 & HAProxy 2)**: Configured as a high-availability cluster (active-passive or active-active) to eliminate the load balancer single point of failure (SPOF) and distribute incoming traffic.
+- **Web Servers (Dedicated Servers)**: Separate servers dedicated solely to handling incoming HTTP/HTTPS requests, serving static assets, and proxying dynamic requests.
+- **Application Servers (Dedicated Servers)**: Separate servers running the application backend logic and code base, isolated from web serving and database storage.
+- **Database Servers (Primary & Replica)**: Dedicated database servers ensuring that data processing, storage, and replication do not compete with web or application resource demands.
+
+---
+
+### 2. Specifics & Explanations (Why Adding Each Element)
+- **Why add a Second Load Balancer (HAProxy Cluster)?** 
+  To eliminate the Single Point of Failure (SPOF) at the entry point of the network. If the primary load balancer fails, the secondary load balancer takes over seamlessly, ensuring continuous availability.
+- **Why split components (Web Server, Application Server, Database) onto their own dedicated servers?** 
+  - **Resource Isolation & Optimization**: Different tiers have different resource bottlenecks (e.g., databases are memory/I/O intensive, while web servers are network/CPU intensive). Isolating them prevents one component from starving another of CPU, RAM, or disk I/O.
+  - **Independent Scalability**: You can scale each tier independently based on demand (e.g., adding more web servers without needing to replicate the entire stack).
+  - **Enhanced Security and Maintainability**: Easier to manage configurations, apply targeted security policies, troubleshoot bottlenecks, and isolate failures to specific layers.
+- **Why add more servers overall?** 
+  To handle higher query-per-second (QPS) traffic loads, distribute processing overhead, and achieve true horizontal scalability and high availability across the entire stack.
