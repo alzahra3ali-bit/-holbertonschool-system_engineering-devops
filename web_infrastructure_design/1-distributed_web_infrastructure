@@ -1,23 +1,40 @@
 https://i.imgur.com/your-diagram-link.png
 
 ### 1. Distributed Web Infrastructure Diagram Description
-This architecture scales out the simple stack by distributing components across multiple servers to improve availability and handle higher traffic.
+This infrastructure expands upon the single-server setup by distributing the components across multiple servers to improve availability, handle higher traffic loads, and reduce single points of failure.
 
-- **Load Balancer (HAProxy)**: Distributes incoming traffic across multiple web servers using a round-robin algorithm.
-- **Web Servers (2x)**: Serve static files and handle incoming client requests.
-- **Application Servers (2x)**: Process dynamic application logic.
-- **Database (Primary-Replica MySQL Cluster)**: Handles database queries with data replication.
+- **User**: Requests www.foobar.com through a web browser.
+- **Load Balancer (HAProxy)**: Acts as the entry point, distributing incoming web traffic between the two web servers.
+- **Web Servers (Server 1 & Server 2 - Nginx)**: Receive client requests and serve static files or forward dynamic requests.
+- **Application Servers (Server 1 & Server 2)**: Process the application logic and codebase.
+- **Databases (MySQL - Primary-Replica Setup)**: Manage data storage, with one node handling writes and the other synchronizing reads.
 
-### 2. Specifics & Setup
-- **Load Balancer Distribution Algorithm**: Round-robin (distributes requests sequentially).
-- **Active-Active vs Active-Passive**:
-  - *Active-Active*: All nodes handle active traffic simultaneously.
-  - *Active-Passive*: The passive node stands by and takes over only if the active node fails.
-- **Primary-Replica Database Setup**:
-  - *Primary (Master)*: Handles write operations (INSERT, UPDATE, DELETE).
-  - *Replica (Slave)*: Handles read operations (SELECT) and syncs data from the primary.
+---
+
+### 2. Specifics & Explanations
+- **Why add a Load Balancer?** 
+  To distribute incoming traffic across multiple servers, preventing any single server from becoming overwhelmed and improving overall availability and performance.
+- **Why add a Second Server?** 
+  To scale out the infrastructure, provide redundancy, and share the workload (handling higher QPS).
+- **Load Balancer Distribution Algorithm:** 
+  Configured with the **Round-Robin** algorithm, which routes each incoming request sequentially to the next server in the list, ensuring an even distribution of traffic.
+- **Active-Active vs. Active-Passive Setup:**
+  - *Active-Active Setup*: Both nodes/servers handle active traffic simultaneously, maximizing resource utilization.
+  - *Active-Passive Setup*: One node handles all active traffic while the secondary (passive) node stands by in idle mode, taking over only if the primary node fails.
+- **How a Database Primary-Replica (Master-Slave) Cluster Works:**
+  - Data modifications are sent to the Primary (Master) database. The Primary records these changes to its binary log and replicates them to the Replica (Slave) database, keeping both databases synchronized.
+- **Difference Between Primary and Replica Nodes:**
+  - *Primary Node*: Handles all write operations (INSERT, UPDATE, DELETE) and optionally reads.
+  - *Replica Node*: Handles read-only operations (SELECT), reducing the read load on the primary node.
+
+---
 
 ### 3. Infrastructure Issues
-- **SpF (Single Points of Failure)**: The Load Balancer and Primary Database are still single points of failure.
-- **Security issues**: No firewall, traffic is unencrypted (HTTP), and no HTTPS.
-- **Lack of monitoring**: No visibility into server health, traffic spikes, or resource usage.
+- **Single Points of Failure (SPOF):** 
+  - The Load Balancer itself is a SPOF (if it crashes, users cannot reach any web servers).
+  - The Primary Database is a SPOF (if it goes down, write operations fail completely).
+- **Security Issues:** 
+  - No firewalls are configured to block unauthorized ports or traffic.
+  - No SSL/TLS (HTTPS) encryption, meaning all web traffic travels in plain text and can be intercepted.
+- **No Monitoring:** 
+  - There are no monitoring or alerting tools (such as Prometheus or Datadog) to track server health, CPU usage, memory, or traffic anomalies in real time.
